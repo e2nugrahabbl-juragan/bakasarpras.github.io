@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Berita Acara Kerusakan Alat</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+body {
+    font-family: "Times New Roman", serif;
+    background: #eee;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+}
+h1 {
+    text-align: center;
+    text-decoration: underline;
+}
+label {
+    font-weight: bold;
+}
+input, textarea {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 10px;
+}
+button {
+    padding: 10px;
+    width: 100%;
+    margin-top: 5px;
+}
+
+/* FORMAT A4 */
+.hasil {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm;
+    margin: auto;
+    background: white;
+    color: black;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table td {
+    padding: 5px;
+    vertical-align: top;
+}
+
+.ttd {
+    margin-top: 60px;
+    display: flex;
+    justify-content: space-between;
+}
+
+img {
+    max-width: 250px;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>FORM BERITA ACARA</h1>
+
+<label>Tanggal</label>
+<input type="date" id="tanggal">
+
+<label>Kategori Barang</label>
+<input type="text" id="kategori">
+
+<label>No Inventaris</label>
+<input type="text" id="inventaris">
+
+<label>Nama Barang</label>
+<input type="text" id="nama">
+
+<label>Lokasi Barang</label>
+<input type="text" id="lokasi">
+
+<label>Deskripsi Kerusakan</label>
+<textarea id="kerusakan"></textarea>
+
+<label>Riwayat Kerusakan</label>
+<textarea id="riwayat"></textarea>
+
+<label>Solusi Yang Dilakukan</label>
+<textarea id="solusi"></textarea>
+
+<label>Rekomendasi</label>
+<textarea id="rekomendasi"></textarea>
+
+<label>Upload Gambar</label>
+<input type="file" id="gambar">
+
+<label>Petugas</label>
+<input type="text" id="petugas">
+
+<label>Email</label>
+<input type="email" id="email">
+
+<button onclick="generate()">Generate</button>
+<button onclick="downloadPDF()">Download PDF A4</button>
+
+<div id="output" class="hasil"></div>
+</div>
+
+<script>
+let imgData = "";
+
+function generate() {
+    const file = document.getElementById('gambar').files[0];
+    const reader = new FileReader();
+
+    if (file) {
+        reader.onload = function(e) {
+            imgData = e.target.result;
+            tampilkan();
+        }
+        reader.readAsDataURL(file);
+    } else {
+        tampilkan();
+    }
+}
+
+function tampilkan() {
+    document.getElementById('output').innerHTML = `
+    <h2 style="text-align:center;">BERITA ACARA KERUSAKAN ALAT</h2>
+    <p>Pada hari ini tanggal <b>${tanggal.value}</b>, telah dilakukan pemeriksaan terhadap alat dengan rincian berikut:</p>
+
+    <table class="table">
+        <tr><td width="200">Kategori Barang</td><td>: ${kategori.value}</td></tr>
+        <tr><td>No Inventaris</td><td>: ${inventaris.value}</td></tr>
+        <tr><td>Nama Barang</td><td>: ${nama.value}</td></tr>
+        <tr><td>Lokasi</td><td>: ${lokasi.value}</td></tr>
+    </table>
+
+    <p><b>Deskripsi Kerusakan</b><br>${kerusakan.value}</p>
+    <p><b>Riwayat Kerusakan</b><br>${riwayat.value}</p>
+    <p><b>Solusi</b><br>${solusi.value}</p>
+    <p><b>Rekomendasi</b><br>${rekomendasi.value}</p>
+
+    ${imgData ? `<p><b>Bukti:</b><br><img src="${imgData}"></p>` : ""}
+
+    <div class="ttd">
+        <div>
+            <p>Petugas</p>
+            <br><br><br>
+            <p><b>${petugas.value}</b></p>
+        </div>
+        <div>
+            <p>Mengetahui</p>
+            <br><br><br>
+            <p><b>(....................)</b></p>
+        </div>
+    </div>
+    `;
+}
+
+function downloadPDF() {
+    const element = document.getElementById("output");
+    const opt = {
+        margin: 0,
+        filename: 'berita_acara_A4.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+</script>
+
+</body>
+</html>
